@@ -289,12 +289,19 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
 <p class="cl"><span>vocal</span> NEQRE・ぷろぽりす幸子</p></div></div><div class="tags"><span class="tag">vocal</span><span class="tag">track</span></div></div></article>
 </main>
 <div class="bgm-grid" id="bgm-grid">
-  <div class="bgm-card" data-id="1M9kxm3TNUUCsLzswH1rQA5N8LVm-s0EW" data-title="Sample 01" data-tags="fantasy,battle" data-bpm="160">
+  <div class="bgm-card" data-src="https://arunar-sound.github.io/bgm/オサレSFファンタジー日常系01_01_05_MAS_4416_ST_BPM100.mp3" data-title="Sample 01" data-tags="sf,daily" data-bpm="100">
     <div class="bgm-thumb"><img src="" alt=""><div class="bgm-play"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#e8e0d0" stroke-width="1"/><polygon points="14,11 26,18 14,25" fill="#e8e0d0"/></svg></div></div>
     <div class="bgm-info">
       <span class="bgm-title">Sample 01</span>
-      <div class="bgm-tags"><span class="bgm-tag">fantasy</span><span class="bgm-tag">battle</span><span class="bgm-tag">160 bpm</span></div>
+      <div class="bgm-tags"><span class="bgm-tag">sf</span><span class="bgm-tag">daily</span><span class="bgm-tag">100 bpm</span></div>
     </div>
+  </div>
+  <div class="bgm-bar" id="bgm-bar">
+    <button class="pbtn" id="bgm-btn-play">play</button>
+    <input class="seek" type="range" id="bgm-seek" value="0" min="0" max="100" step="0.1" style="flex:1">
+    <span class="ptime" id="bgm-time">0:00 / 0:00</span>
+    <span style="font-size:9px;color:var(--muted);letter-spacing:.06em;flex-shrink:0">vol</span>
+    <input class="seek" type="range" id="bgm-vol" value="50" min="0" max="100" step="1" style="flex:0 0 60px">
   </div>
 </div>
 <footer><span class="aph">A place of sound imagination and philosophy</span><button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="bc" style="font-size:9px;letter-spacing:.25em">&#8593; INDEX</button></footer>
@@ -457,21 +464,52 @@ document.getElementById('tab-bgm').addEventListener('click', function() {
 });
 
 // ---- BGM CARD PLAYER ----
+function bgmFt(s){ if(!s||isNaN(s)) return '0:00'; return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'); }
+
+function bgmUpdateBar(){
+  if(!bgmAudio2) return;
+  var d=bgmAudio2.duration||0, c=bgmAudio2.currentTime||0;
+  document.getElementById('bgm-seek').value = d ? c/d*100 : 0;
+  document.getElementById('bgm-time').textContent = bgmFt(c)+' / '+bgmFt(d);
+}
+
+function bgmPlayCard(card){
+  if(bgmAudio2){ bgmAudio2.pause(); bgmAudio2=null; }
+  currentCard = card;
+  bgmAudio2 = new Audio(card.dataset.src);
+  bgmAudio2.volume = document.getElementById('bgm-vol').value / 100;
+  bgmAudio2.addEventListener('timeupdate', bgmUpdateBar);
+  bgmAudio2.addEventListener('loadedmetadata', bgmUpdateBar);
+  bgmAudio2.play();
+  bgmPlaying2 = true;
+  document.getElementById('bgm-btn-play').textContent = 'pause';
+  document.getElementById('bgm-bar').classList.add('active');
+}
+
 document.getElementById('bgm-grid').addEventListener('click', function(e) {
   var card = e.target.closest('.bgm-card');
   if (!card) return;
-  var id = card.dataset.id;
   if (currentCard === card && bgmAudio2) {
-    if (bgmPlaying2) { bgmAudio2.pause(); bgmPlaying2=false; }
-    else { bgmAudio2.play(); bgmPlaying2=true; }
+    if (bgmPlaying2) { bgmAudio2.pause(); bgmPlaying2=false; document.getElementById('bgm-btn-play').textContent='play'; }
+    else { bgmAudio2.play(); bgmPlaying2=true; document.getElementById('bgm-btn-play').textContent='pause'; }
     return;
   }
-  if (bgmAudio2) { bgmAudio2.pause(); bgmAudio2=null; }
-  currentCard = card;
-  bgmAudio2 = new Audio('https://drive.google.com/uc?export=open&id=' + id);
-  bgmAudio2.volume = 0.5;
-  bgmAudio2.play();
-  bgmPlaying2 = true;
+  bgmPlayCard(card);
+});
+
+document.getElementById('bgm-btn-play').addEventListener('click', function(e){
+  e.stopPropagation();
+  if(!bgmAudio2) return;
+  if(bgmPlaying2){ bgmAudio2.pause(); bgmPlaying2=false; this.textContent='play'; }
+  else { bgmAudio2.play(); bgmPlaying2=true; this.textContent='pause'; }
+});
+
+document.getElementById('bgm-seek').addEventListener('input', function(){
+  if(bgmAudio2&&bgmAudio2.duration) bgmAudio2.currentTime=bgmAudio2.duration*this.value/100;
+});
+
+document.getElementById('bgm-vol').addEventListener('input', function(){
+  if(bgmAudio2) bgmAudio2.volume=this.value/100;
 });
 
 // ---- CATEGORY + SORT ----
