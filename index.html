@@ -31,6 +31,7 @@ h1 em{font-style:normal;font-family:'Space Mono',monospace;color:var(--muted);fo
 .track:hover{background:var(--bg2)}
 .track.hidden{display:none!important}
 .num{position:absolute;top:20px;right:20px;font-size:10px;color:var(--muted);letter-spacing:.1em;z-index:5;pointer-events:none}
+.new-badge{position:absolute;top:12px;left:12px;font-size:9px;letter-spacing:.2em;color:#141414;background:var(--accent);padding:3px 8px;z-index:5;pointer-events:none;font-family:'Space Mono',monospace}
 .ew{position:relative;width:100%;padding-top:56.25%;background:#000;border-bottom:1px solid var(--line);overflow:hidden;cursor:default}
 .et{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .3s;z-index:1}
 .ew.on .et{opacity:0;pointer-events:none}
@@ -326,6 +327,8 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
         <button class="pbtn" id="pb-next">&#9654;&#9654;</button>
         <input class="seek" type="range" id="pb-seek" value="0" min="0" max="100" step="0.1">
         <span class="ptime" id="pb-time">0:00 / 0:00</span>
+        <span style="font-size:9px;color:var(--muted);letter-spacing:.06em;flex-shrink:0">vol</span>
+        <input class="seek" type="range" id="pb-vol" value="50" min="0" max="100" step="1" style="flex:0 0 60px">
       </div>
     </div>
     <div class="bml" id="bml"></div>
@@ -456,7 +459,17 @@ function applyFS() {
   visible.forEach(function(t,i) {
     t.style.order = i;
     t.querySelector('.num').textContent = String(n++).padStart(2,'0');
+    // NEWバッジ：日付が最も新しい1件のみ
+    var existing = t.querySelector('.new-badge');
+    if (existing) existing.remove();
   });
+  if (visible.length > 0) {
+    var newest = visible.slice().sort(function(a,b){ return new Date(b.dataset.date)-new Date(a.dataset.date); })[0];
+    var badge = document.createElement('span');
+    badge.className = 'new-badge';
+    badge.textContent = 'NEW';
+    newest.querySelector('.ew').appendChild(badge);
+  }
 }
 
 document.querySelectorAll('.fn[data-sort]').forEach(function(btn) {
@@ -494,6 +507,7 @@ function bgmLoad(i, play) {
   if(bgmAudio) { bgmAudio.pause(); bgmAudio.src=''; }
   bgmIdx=i; bgmPlaying=false;
   bgmAudio = new Audio('https://drive.google.com/uc?export=open&id=' + TRACKS[i].id);
+  bgmAudio.volume = document.getElementById('pb-vol').value / 100;
   bgmAudio.addEventListener('timeupdate', bgmSeekUpdate);
   bgmAudio.addEventListener('loadedmetadata', bgmSeekUpdate);
   bgmAudio.addEventListener('ended', function() { bgmLoad((bgmIdx+1)%TRACKS.length, true); });
@@ -522,6 +536,7 @@ document.getElementById('pb-play').addEventListener('click', bgmToggle);
 document.getElementById('pb-prev').addEventListener('click', function() { bgmLoad(bgmIdx<=0?TRACKS.length-1:bgmIdx-1, bgmPlaying||bgmIdx>=0); });
 document.getElementById('pb-next').addEventListener('click', function() { bgmLoad((bgmIdx+1)%TRACKS.length, true); });
 document.getElementById('pb-seek').addEventListener('input', function() { if(bgmAudio&&bgmAudio.duration) bgmAudio.currentTime=bgmAudio.duration*this.value/100; });
+document.getElementById('pb-vol').addEventListener('input', function() { if(bgmAudio) bgmAudio.volume=this.value/100; });
 document.getElementById('btn-bgm').addEventListener('click', function() { bgmRender(); openOverlay('bmo'); });
 document.getElementById('bmo-x').addEventListener('click', function() { closeOverlay('bmo'); });
 document.getElementById('bmo').addEventListener('click', function(e) { if(e.target===this) closeOverlay('bmo'); });
