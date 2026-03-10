@@ -30,9 +30,7 @@ h1 em{font-style:normal;font-family:'Space Mono',monospace;color:var(--muted);fo
 .bgm-grid{display:none;flex-direction:column;gap:1px;background:var(--bg);padding:1px}
 .bgm-card{display:flex;align-items:center;gap:0;background:var(--bg);border-bottom:1px solid var(--line);cursor:pointer;transition:background .2s}
 .bgm-card:hover{background:var(--bg2)}
-.bgm-thumb{width:80px;height:60px;background:#000;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.bgm-thumb img{width:100%;height:100%;object-fit:cover;opacity:.5}
-.bgm-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.bgm-thumb{width:60px;height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--line)}
 .bgm-play svg{width:24px;height:24px}
 .bgm-info{flex:1;padding:12px 20px;display:flex;flex-direction:column;gap:4px}
 .bgm-title{font-size:11px;letter-spacing:.1em;color:var(--text)}
@@ -153,17 +151,14 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
 </header>
 <div class="fb">
   <button class="fn active" id="tab-vocal">vocal sound works</button>
+  <button class="fn active" data-cat="commercial">official</button>
+  <button class="fn" data-cat="indie">indie</button>
+  <span style="display:inline-block;width:16px"></span>
   <button class="fn" id="tab-bgm">bgm samples</button>
-  <span id="vocal-controls" style="display:contents">
-    <span style="margin-left:8px"></span>
-    <button class="fn active" data-cat="commercial">official</button>
-    <button class="fn" data-cat="indie">indie</button>
-    <span class="fs"></span>
-    <span class="fl">sort</span>
-    <button class="fn active" data-sort="new">new &#8594; old</button>
-    <button class="fn" data-sort="old">old &#8594; new</button>
-  </span>
-  <span id="bgm-controls" style="display:none;contents:none;flex:1;gap:4px;align-items:center"></span>
+  <span class="fs"></span>
+  <span class="fl">sort</span>
+  <button class="fn active" data-sort="new">new &#8594; old</button>
+  <button class="fn" data-sort="old">old &#8594; new</button>
 </div>
 <div id="unit-filter" style="display:none;padding:8px 48px 12px;gap:4px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line);position:sticky;top:57px;z-index:99;background:var(--bg)"></div>
 <main class="grid" id="grid">
@@ -290,7 +285,7 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
 </main>
 <div class="bgm-grid" id="bgm-grid">
   <div class="bgm-card" data-src="https://arunar-sound.github.io/bgm/オサレSFファンタジー日常系01_01_05_MAS_4416_ST_BPM100.mp3" data-title="Sample 01" data-tags="sf,daily" data-bpm="100">
-    <div class="bgm-thumb"><img src="" alt=""><div class="bgm-play"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#e8e0d0" stroke-width="1"/><polygon points="14,11 26,18 14,25" fill="#e8e0d0"/></svg></div></div>
+    <div class="bgm-thumb"><div class="bgm-play"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#e8e0d0" stroke-width="1"/><polygon points="14,11 26,18 14,25" fill="#e8e0d0"/></svg></div></div>
     <div class="bgm-info">
       <span class="bgm-title">Sample 01</span>
       <div class="bgm-tags"><span class="bgm-tag">sf</span><span class="bgm-tag">daily</span><span class="bgm-tag">100 bpm</span></div>
@@ -440,27 +435,31 @@ function closeOverlay(id) { document.getElementById(id).classList.remove('open')
 var currentTab = 'vocal';
 var bgmAudio2 = null, bgmPlaying2 = false, currentCard = null;
 
-document.getElementById('tab-vocal').addEventListener('click', function() {
+function switchToVocal() {
   currentTab = 'vocal';
   document.getElementById('tab-vocal').classList.add('active');
   document.getElementById('tab-bgm').classList.remove('active');
-  document.getElementById('vocal-controls').style.display = 'contents';
-  document.getElementById('bgm-controls').style.display = 'none';
   document.getElementById('grid').style.display = '';
   document.getElementById('bgm-grid').style.display = 'none';
-  document.getElementById('unit-filter').style.display = 'none';
+  document.querySelectorAll('[data-cat],[data-sort]').forEach(function(b){ b.style.display=''; });
+  document.querySelectorAll('.fl,.fs').forEach(function(b){ b.style.display=''; });
   if(bgmAudio2){ bgmAudio2.pause(); bgmAudio2=null; bgmPlaying2=false; }
-});
+}
 
-document.getElementById('tab-bgm').addEventListener('click', function() {
+function switchToBgm() {
   currentTab = 'bgm';
   document.getElementById('tab-bgm').classList.add('active');
   document.getElementById('tab-vocal').classList.remove('active');
-  document.getElementById('vocal-controls').style.display = 'none';
-  document.getElementById('bgm-controls').style.display = 'flex';
   document.getElementById('grid').style.display = 'none';
   document.getElementById('bgm-grid').style.display = 'flex';
   document.getElementById('unit-filter').style.display = 'none';
+  document.querySelectorAll('[data-cat],[data-sort]').forEach(function(b){ b.style.display='none'; });
+  document.querySelectorAll('.fl,.fs').forEach(function(b){ b.style.display='none'; });
+}
+
+document.getElementById('tab-vocal').addEventListener('click', switchToVocal);
+document.getElementById('tab-bgm').addEventListener('click', function() {
+  if(currentTab === 'bgm') switchToVocal(); else switchToBgm();
 });
 
 // ---- BGM CARD PLAYER ----
