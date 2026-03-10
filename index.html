@@ -23,7 +23,7 @@ h1 em{font-style:normal;font-family:'Space Mono',monospace;color:var(--muted);fo
 .bc:hover{border-color:var(--mid);color:var(--text)}
 .fb{padding:18px 48px;border-bottom:1px solid var(--line);display:flex;gap:4px;flex-wrap:wrap;align-items:center;position:sticky;top:0;z-index:100;background:var(--bg)}
 .fl{font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-right:8px}
-.fn{background:none;border:1px solid var(--line);color:var(--mid);padding:4px 14px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.fn{background:none;border:1px solid var(--line);color:var(--mid);padding:4px 14px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;cursor:pointer;transition:all .2s;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center}
 .fn:hover,.fn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,224,208,.05)}
 .fs{flex:1}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:1px;background:var(--bg)}
@@ -129,11 +129,10 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
   <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:20px"><h1>ALNEAR</h1><p class="aln">ALlsoundNEARfield.</p></div>
   <div class="ha">
     <button class="bp" id="btn-profile">&#9656; profile &amp; units</button>
-    <button class="bc" id="btn-bgm">&#9834; BGM samples</button>
-    <a class="bc" href="https://x.com/aruna_ryuki" target="_blank">&#8599; X</a>
-    <a class="bc" href="https://skeb.jp/@aruna_ryuki" target="_blank">&#8599; SKEB</a>
-    <a class="bc" href="https://skima.jp/profile?id=506476" target="_blank">&#8599; SKIMA</a>
-    <a class="bc" href="https://alnear.fanbox.cc/" target="_blank">&#8599; FanBox</a>
+    <a class="bc" href="https://x.com/aruna_ryuki" target="_blank">X</a>
+    <a class="bc" href="https://skeb.jp/@aruna_ryuki" target="_blank">SKEB</a>
+    <a class="bc" href="https://skima.jp/profile?id=506476" target="_blank">SKIMA</a>
+    <a class="bc" href="https://alnear.fanbox.cc/" target="_blank">FanBox</a>
     <button class="bc" id="copy-email-top">&#9993; copy email</button>
   </div>
 </header>
@@ -142,6 +141,7 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
   <button class="fn active" data-cat="commercial">official</button>
   <button class="fn" data-cat="indie">indie</button>
   <span class="fs"></span>
+  <a class="fn" href="bgm.html">bgm samples</a>
   <span class="fl">sort</span>
   <button class="fn active" data-sort="new">new &#8594; old</button>
   <button class="fn" data-sort="old">old &#8594; new</button>
@@ -537,12 +537,12 @@ document.getElementById('pb-prev').addEventListener('click', function() { bgmLoa
 document.getElementById('pb-next').addEventListener('click', function() { bgmLoad((bgmIdx+1)%TRACKS.length, true); });
 document.getElementById('pb-seek').addEventListener('input', function() { if(bgmAudio&&bgmAudio.duration) bgmAudio.currentTime=bgmAudio.duration*this.value/100; });
 document.getElementById('pb-vol').addEventListener('input', function() { if(bgmAudio) bgmAudio.volume=this.value/100; });
-document.getElementById('btn-bgm').addEventListener('click', function() { bgmRender(); openOverlay('bmo'); });
 document.getElementById('bmo-x').addEventListener('click', function() { closeOverlay('bmo'); });
 document.getElementById('bmo').addEventListener('click', function(e) { if(e.target===this) closeOverlay('bmo'); });
 
 
 // ---- COPY EMAIL ----
+var _em = ['arunar0415','gmail.com'].join('@');
 var copyTop = document.getElementById('copy-email-top');
 if(copyTop) copyTop.addEventListener('click', function() {
   navigator.clipboard.writeText(_em).then(function() {
@@ -550,7 +550,6 @@ if(copyTop) copyTop.addEventListener('click', function() {
     setTimeout(function(){ copyTop.textContent = '✉ copy email'; }, 2000);
   });
 });
-var _em = ['arunar0415','gmail.com'].join('@');
 var copyBtn = document.getElementById('copy-email-btn');
 if(copyBtn) copyBtn.addEventListener('click', function() {
   navigator.clipboard.writeText(_em).then(function() {
