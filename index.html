@@ -404,7 +404,7 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
   </div>
 
   <!-- PK系 -->
-  <div class="bgm-card" data-src="https://arunar-sound.github.io/bgm/PK_BGM008_形勢逆転_01_05_TD_4416_ST_BPM150.mp3" data-world="modern" data-scene="heroic battle">
+  <div class="bgm-card" data-src="https://arunar-sound.github.io/bgm/PK_BGM008_形勢逆転_01_05_TD_4416_ST_BPM150.mp3" data-world="modern" data-scene="heroic battle" data-hidden="1" style="display:none">
     <div class="bgm-thumb"><div class="bgm-play"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#e8e0d0" stroke-width="1"/><polygon points="14,11 26,18 14,25" fill="#e8e0d0"/></svg></div></div>
     <div class="bgm-info"><span class="bgm-title">現代ヒロイック02</span><div class="bgm-tags"><span class="bgm-tag">現代</span><span class="bgm-tag">ヒロイック</span><span class="bgm-tag">バトル</span></div></div>
   </div>
@@ -416,7 +416,7 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
     <div class="bgm-thumb"><div class="bgm-play"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#e8e0d0" stroke-width="1"/><polygon points="14,11 26,18 14,25" fill="#e8e0d0"/></svg></div></div>
     <div class="bgm-info"><span class="bgm-title">ファンタジー感動01</span><div class="bgm-tags"><span class="bgm-tag">ファンタジー</span><span class="bgm-tag">青春</span><span class="bgm-tag">感動</span></div></div>
   </div>
-  <div class="bgm-card" data-src="https://arunar-sound.github.io/bgm/PK_BGM018_怒涛のNTR_01_03_TD_4416_ST_BPM100.mp3" data-world="modern" data-scene="nostalgic">
+  <div class="bgm-card" data-src="https://arunar-sound.github.io/bgm/PK_BGM018_怒涛のNTR_01_03_TD_4416_ST_BPM100.mp3" data-world="modern" data-scene="nostalgic" data-hidden="1" style="display:none">
     <div class="bgm-thumb"><div class="bgm-play"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#e8e0d0" stroke-width="1"/><polygon points="14,11 26,18 14,25" fill="#e8e0d0"/></svg></div></div>
     <div class="bgm-info"><span class="bgm-title">現代哀愁01</span><div class="bgm-tags"><span class="bgm-tag">現代</span><span class="bgm-tag">哀愁</span></div></div>
   </div>
@@ -694,15 +694,24 @@ function applyBgmFilter() {
     var sOk = bgmScenes.length === 0 || bgmScenes.every(function(sc) {
       return s.some(function(cs) { return cs === sc || (sc === 'daily' && cs.startsWith('daily')); });
     });
+    if(card.dataset.hidden) return;
     card.style.display = (wOk && sOk) ? '' : 'none';
   });
 }
 
 document.querySelectorAll('.bgf[data-world]').forEach(function(btn) {
   btn.addEventListener('click', function() {
-    document.querySelectorAll('.bgf[data-world]').forEach(function(b){ b.classList.remove('active'); });
-    this.classList.add('active');
-    bgmWorld = this.dataset.world;
+    var w = this.dataset.world;
+    if(w !== 'all' && bgmWorld === w) {
+      // 同じボタンを再押し → allに戻す
+      bgmWorld = 'all';
+      document.querySelectorAll('.bgf[data-world]').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelector('.bgf[data-world="all"]').classList.add('active');
+    } else {
+      document.querySelectorAll('.bgf[data-world]').forEach(function(b){ b.classList.remove('active'); });
+      this.classList.add('active');
+      bgmWorld = w;
+    }
     applyBgmFilter();
   });
 });
@@ -715,15 +724,18 @@ document.querySelectorAll('.bgf[data-scene]').forEach(function(btn) {
       document.querySelectorAll('.bgf[data-scene]').forEach(function(b){ b.classList.remove('active'); });
       this.classList.add('active');
     } else {
-      document.querySelector('.bgf[data-scene="all"]').classList.remove('active');
       var idx = bgmScenes.indexOf(sc);
       if(idx >= 0) {
+        // 同じボタンを再押し → 選択解除
         bgmScenes.splice(idx, 1);
         this.classList.remove('active');
-        if(bgmScenes.length === 0) document.querySelector('.bgf[data-scene="all"]').classList.add('active');
       } else {
         bgmScenes.push(sc);
         this.classList.add('active');
+      }
+      document.querySelector('.bgf[data-scene="all"]').classList.remove('active');
+      if(bgmScenes.length === 0) {
+        document.querySelector('.bgf[data-scene="all"]').classList.add('active');
       }
     }
     applyBgmFilter();
