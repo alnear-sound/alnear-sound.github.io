@@ -39,7 +39,7 @@ h1 em{font-style:normal;font-family:'Space Mono',monospace;color:var(--muted);fo
 .bgm-tags{display:flex;gap:4px;flex-wrap:wrap}
 .bgm-tag{font-size:9px;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);padding:2px 6px;text-transform:uppercase}
 .bgm-ctrl{display:flex;align-items:center;gap:12px;padding:12px 24px 12px 0;flex-shrink:0}
-.bgm-bar{display:none;background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 48px;align-items:center;gap:10px;position:sticky;top:57px;z-index:98}
+.bgm-bar{display:none;background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 48px;align-items:center;gap:10px;position:fixed;bottom:0;left:0;right:0;z-index:98}
 .bgm-bpm{font-size:9px;color:var(--muted);letter-spacing:.06em;flex-shrink:0}
 .track{background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;transition:background .3s}
 .track:hover{background:var(--bg2)}
@@ -198,6 +198,7 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
     <button class="fn bgf" data-scene="anxious">焦燥感</button>
     <button class="fn bgf" data-scene="tragic">悲壮</button>
     <button class="fn bgf" data-scene="achievement">達成感</button>
+    <button class="fn bgf" data-scene="chiptune">chiptune</button>
   </div>
 </div>
 <div class="bgm-bar" id="bgm-bar">
@@ -549,6 +550,10 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
     <div class="bgm-thumb"><div class="bgm-play"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#e8e0d0" stroke-width="1"/><polygon points="14,11 26,18 14,25" fill="#e8e0d0"/></svg></div></div>
     <div class="bgm-info"><span class="bgm-title">現代バトル05</span><div class="bgm-tags"><span class="bgm-tag">現代</span><span class="bgm-tag">バトル</span><span class="bgm-tag">ハード</span><span class="bgm-tag">ヒロイック</span></div></div>
   </div>
+  <div class="bgm-card" data-src="https://arunar-sound.github.io/bgm/荒咬オウガBGM_01_05_TD_4416_ST_BPM200.mp3" data-world="all" data-scene="sf chiptune heroic">
+    <div class="bgm-thumb"><div class="bgm-play"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#e8e0d0" stroke-width="1"/><polygon points="14,11 26,18 14,25" fill="#e8e0d0"/></svg></div></div>
+    <div class="bgm-info"><span class="bgm-title">SFchiptune01</span><div class="bgm-tags"><span class="bgm-tag">SF</span><span class="bgm-tag">chiptune</span><span class="bgm-tag">ヒロイック</span></div></div>
+  </div>
 
 </div>
 <footer><span class="aph">A place of sound imagination and philosophy</span><button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="bc" style="font-size:9px;letter-spacing:.25em">&#8593; INDEX</button></footer>
@@ -695,6 +700,7 @@ function switchToVocal() {
   document.getElementById('bgm-grid').style.display = 'none';
   document.getElementById('bgm-filter').style.display = 'none';
   document.getElementById('bgm-bar').style.display = 'none';
+  document.querySelector('footer').style.paddingBottom = '';
   document.querySelectorAll('[data-cat],[data-sort]').forEach(function(b){ b.style.display=''; });
   document.querySelectorAll('.fl,.fs').forEach(function(b){ b.style.display=''; });
   if(bgmAudio2){ bgmAudio2.pause(); bgmAudio2=null; bgmPlaying2=false; }
@@ -709,6 +715,7 @@ function switchToBgm() {
   document.getElementById('bgm-grid').style.display = 'grid';
   document.getElementById('bgm-filter').style.display = 'flex';
   document.getElementById('bgm-bar').style.display = 'flex';
+  document.querySelector('footer').style.paddingBottom = '80px';
   document.getElementById('unit-filter').style.display = 'none';
   document.querySelectorAll('[data-cat],[data-sort]').forEach(function(b){ b.style.display='none'; });
   document.querySelectorAll('.fl,.fs').forEach(function(b){ b.style.display='none'; });
