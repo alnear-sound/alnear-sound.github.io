@@ -212,7 +212,7 @@ footer{padding:40px 48px;border-top:1px solid var(--line);color:var(--muted);fon
   <input class="seek" type="range" id="bgm-seek" value="0" min="0" max="100" step="0.1" style="flex:1">
   <span class="ptime" id="bgm-time">0:00 / 0:00</span>
   <span style="font-size:9px;color:var(--muted);letter-spacing:.06em;flex-shrink:0">vol</span>
-  <input class="seek" type="range" id="bgm-vol" value="50" min="0" max="100" step="1" style="flex:0 0 60px">
+  <input class="seek" type="range" id="bgm-vol" value="33" min="0" max="100" step="1" style="flex:0 0 60px">
 </div>
 <main class="grid" id="grid">
 <article class="track" data-category="commercial" data-genre="vocal op-ed sound-produce" data-date="Oct 31, 2025" data-vid="nkse8zUrUz8" data-title="RE:EXiSTENCE" data-brand="CRYSTALiA" data-gametitle="CRACK≡TRICK!" data-credits="lyric|Ryohei Haduki (U-RASIA)||music|ALNEAR||vocal|和良ゆの||produce|RESTARiZE" data-tags="vocal,op,sound produce"><span class="num">01</span><div class="ew" data-vid="nkse8zUrUz8"><img class="et" src="https://img.youtube.com/vi/nkse8zUrUz8/maxresdefault.jpg" alt=""><div class="ep"><svg viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="25" stroke="#e8e0d0" stroke-width="1"/><polygon points="21,17 38,26 21,35" fill="#e8e0d0"/></svg><div class="epbtns"><button class="epbtn" data-action="preview">▶ mute preview</button><button class="epbtn" data-action="full">⤢ sound on · full</button></div></div></div><div class="ti"><div class="tm"><span class="tt">RE:EXiSTENCE</span><div class="tc"><span class="tl">brand</span>CRYSTALiA</div><div class="tg2"><span class="tl">title</span>CRACK≡TRICK!</div><div class="tcr"><p class="cl"><span>lyric</span> Ryohei Haduki (U-RASIA)</p>
@@ -786,14 +786,12 @@ document.querySelectorAll('.bgm-card').forEach(function(card, i) {
 });
 
 // ---- BGM FILTER ----
-var bgmScenes = [];
+var bgmScene = 'all';
 
 function applyBgmFilter() {
   document.querySelectorAll('.bgm-card').forEach(function(card) {
     var s = (card.dataset.scene || '').split(' ');
-    var sOk = bgmScenes.length === 0 || bgmScenes.every(function(sc) {
-      return s.some(function(cs) { return cs === sc; });
-    });
+    var sOk = bgmScene === 'all' || s.indexOf(bgmScene) >= 0;
     if(card.dataset.hidden) return;
     card.style.display = sOk ? '' : 'none';
   });
@@ -802,24 +800,15 @@ function applyBgmFilter() {
 document.querySelectorAll('.bgf[data-scene]').forEach(function(btn) {
   btn.addEventListener('click', function() {
     var sc = this.dataset.scene;
-    if(sc === 'all') {
-      bgmScenes = [];
+    if(sc !== 'all' && bgmScene === sc) {
+      // 同じボタンを再押し → allに戻る
+      bgmScene = 'all';
+      document.querySelectorAll('.bgf[data-scene]').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelector('.bgf[data-scene="all"]').classList.add('active');
+    } else {
+      bgmScene = sc;
       document.querySelectorAll('.bgf[data-scene]').forEach(function(b){ b.classList.remove('active'); });
       this.classList.add('active');
-    } else {
-      var idx = bgmScenes.indexOf(sc);
-      if(idx >= 0) {
-        // 同じボタンを再押し → 選択解除
-        bgmScenes.splice(idx, 1);
-        this.classList.remove('active');
-      } else {
-        bgmScenes.push(sc);
-        this.classList.add('active');
-      }
-      document.querySelector('.bgf[data-scene="all"]').classList.remove('active');
-      if(bgmScenes.length === 0) {
-        document.querySelector('.bgf[data-scene="all"]').classList.add('active');
-      }
     }
     applyBgmFilter();
   });
